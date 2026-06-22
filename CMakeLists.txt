@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.12)
 project(torch)
 include(FetchContent)
 
+# The pinned spdlog (7e635fc) bundles an fmt whose compile-time format-string
+# check is gated on consteval, which Apple clang 21+ rejects. Neutralize the
+# gate as a directory compile option (spdlog overwrites CMAKE_CXX_FLAGS, so a
+# plain CXXFLAGS/CMAKE_CXX_FLAGS approach would not survive).
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-DFMT_CONSTEVAL=)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 
