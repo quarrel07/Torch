@@ -5,6 +5,14 @@ include(FetchContent)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 
+# Clang (incl. Apple clang 21+) rejects the `consteval` compile-time format-string
+# checks in the pinned spdlog's bundled fmt as non-constant-expressions. Neutralize
+# FMT_CONSTEVAL so it degrades to a runtime check. This is added as a directory
+# compile option (not via CMAKE_CXX_FLAGS, which spdlog's CMakeLists overwrites).
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-DFMT_CONSTEVAL=)
+endif()
+
 # Set build options
 option(USE_STANDALONE "Build as a standalone executable" ON)
 option(BUILD_STORMLIB "Build with StormLib support" ON)
